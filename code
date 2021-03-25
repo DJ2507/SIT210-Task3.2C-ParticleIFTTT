@@ -1,0 +1,28 @@
+#define Light_Thresh 20
+int photoresistor = A0;
+int light_lvl_prev = -1;
+int light_lvl_current;
+int Over_Thresh = -1;
+
+void setup() 
+{
+    pinMode(photoresistor, INPUT);
+    Particle.variable("sunlightThreshold", &Over_Thresh, INT);
+}
+
+void loop() 
+{
+    light_lvl_current = analogRead(photoresistor);
+    Particle.publish("Sunlight", String(light_lvl_current), PRIVATE);
+    if (light_lvl_prev != -1 && light_lvl_prev < Light_Thresh && light_lvl_current >= Light_Thresh)
+    {
+        Over_Thresh = 1;
+    }
+    if (light_lvl_prev != -1 && light_lvl_prev >= Light_Thresh && light_lvl_current < Light_Thresh)
+    {
+        Over_Thresh = 0;
+    }
+    light_lvl_prev = light_lvl_current;
+    Over_Thresh = -1;
+    delay(30000);
+}
